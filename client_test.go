@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// テスト用のtokenとして、公式websiteのサンプルで使われているtokenを拝借した
+// https://calil.jp/doc/api_sample.html
 const dummyAppKey = "2bc265ea827cb23b11d1ee80a25ef575"
 
 
