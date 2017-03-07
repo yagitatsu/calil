@@ -1,2 +1,2 @@
 # calil
-calil api written by Go
+calil API written by Go
