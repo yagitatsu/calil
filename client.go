@@ -49,6 +49,26 @@ type (
 		Image      string `json:"image"`
 		Distance   string `json:"distance"`
 	}
+
+	CheckParams struct {
+		ISBN     string `json:"isbn"`
+		SystemID string `json:"system_id"`
+		Format   string `json:"format"`
+		Session  string `json:"session"`
+	}
+	CheckResult struct {
+		Session  string          `json:"session"`
+		Books    map[string]Book `json:"books"`
+		Continue int             `json:"continue"`
+	}
+
+	Book map[string]System
+
+	System struct {
+		Status     string        `json:"status"`
+		ReserveURL string        `json:"reserveurl"`
+		LibKey map[string]string `json:"libkey"`
+	}
 )
 
 func NewClient(appkey string, client *http.Client) *Client {
@@ -83,6 +103,37 @@ func (c *Client) SearchLibrary(p SearchLibraryParams) (SearchLibraryResult, erro
 	var ret SearchLibraryResult
 	if err := json.NewDecoder(resp.Body).Decode(&ret.Libraries); err != nil {
 		return SearchLibraryResult{}, err
+	}
+
+	return ret, nil
+}
+
+func (c *Client) Check(p CheckParams) (CheckResult, error) {
+	const method = "check"
+
+	values := url.Values{
+		"appkey":   {c.AppKey},
+		"isbn":     {p.ISBN},
+		"systemid": {p.SystemID},
+		"format":   {p.Format},
+		"callback": {"no"},
+		"session": {p.Session},
+	}
+
+	req, err := c.newRequest(http.MethodGet, method, bytes.NewBufferString(values.Encode()))
+	if err != nil {
+		return CheckResult{}, err
+	}
+
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return CheckResult{}, err
+	}
+	defer resp.Body.Close()
+
+	var ret CheckResult
+	if err := json.NewDecoder(resp.Body).Decode(&ret); err != nil {
+		return CheckResult{}, err
 	}
 
 	return ret, nil

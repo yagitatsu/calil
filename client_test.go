@@ -22,9 +22,25 @@ func TestSearchLibrary(t *testing.T) {
 		t.Fatalf("unexpected error: %s", err)
 	}
 
-	t.Logf("result=%v", result)
+	t.Logf("result=%#v", result)
 
 	if result.Libraries[0].City != "世田谷区" {
 		t.Errorf("city is expected: `世田谷区`, actual: `%s`", result.Libraries[0].City)
 	}
+}
+
+func TestClient_Check(t *testing.T) {
+	client := NewClient(dummyAppKey, http.DefaultClient)
+	result, err := client.Check(CheckParams{
+		ISBN: "4834000826",
+		SystemID: "Tokyo_Setagaya",
+		Format: "json",
+
+	})
+
+	if err != nil {
+		t.Fatalf("unexpected error: %s", err)
+	}
+
+	t.Logf("result=%#v", result)
 }
